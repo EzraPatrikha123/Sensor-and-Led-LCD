@@ -1,0 +1,65 @@
+#include <LiquidCrystal_I2C.h>
+
+LiquidCrystal_I2C lcd(0x20, 16, 2); // Use the correct I2C address after scanning
+
+int trigPin = 12; //Yellow
+int echPin = 13; //Blue
+int led = 8; //Turqoise
+
+long duration = 0;
+int cm = 0;
+int inch = 0;
+
+void setup()
+{
+  lcd.init(); // Initialize the LCD
+  lcd.backlight();
+  pinMode(led, OUTPUT);
+  pinMode(trigPin, OUTPUT);
+  pinMode(echPin, INPUT);
+  Serial.begin(9600);
+  Serial.println("Distance Measurement: ");
+  delay(500);
+}
+
+void loop()
+{
+  digitalWrite(trigPin, LOW);
+  delayMicroseconds(2);
+  digitalWrite(trigPin, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(trigPin, LOW);
+  
+  duration = pulseIn(echPin, HIGH);
+  cm = duration * 0.034 / 2;
+  inch = duration * 0.0133 / 2;
+  
+  Serial.print("Distance: ");
+  Serial.print(cm);
+  Serial.println("cm");
+  
+  lcd.clear();
+  
+  lcd.setCursor(0, 0);
+  lcd.print("Distance is: ");
+  
+  lcd.setCursor(0, 1);
+  lcd.print(cm);
+  lcd.setCursor(4, 1);
+  lcd.print("cm");
+  
+  if (inch < 50) {
+    digitalWrite(led, HIGH);
+  } else {
+    digitalWrite(led, LOW);
+  }
+
+  if (inch < 100) {
+    Serial.print("Inches: ");
+    Serial.println(inch);
+    Serial.print("Cm: ");
+    Serial.println(cm);
+  }
+  
+  delay(500);
+}
